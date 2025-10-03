@@ -62,9 +62,20 @@ class VarInt(var value: Int) {
          * Reads in bytes from an input stream
          */
         fun fromStream(input: BufferedInputStream): VarInt {
+            var value = 0
             // only read up to 5 bytes
-            for(i in 0..4){}
-            return VarInt()
+            for(i in 0..4) {
+                // read in the next byte
+                val curByte = input.readNBytes(1)
+                // if the read byte array size is 0, then there are no more bytes, so finish
+                // ( should not happen in a packet, but does happen in tests )
+                if(curByte.size == 0)
+                    break
+
+                // or in the segment, shifted left by the correct amount
+                value = value or ((curByte[0].toInt() and SEGMENT_MASK) shl i*7)
+            }
+            return VarInt(value)
         }
     }
 }
