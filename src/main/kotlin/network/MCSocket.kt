@@ -23,5 +23,7 @@ class MCSocket(val hostname: String, val port: Int, val protocolVersion: Int) {
         output.flush()
 
         // create and send a status request packet
+        output.write(StatusRequestPacket().toBytes())
+        output.flush()
     }
 }
