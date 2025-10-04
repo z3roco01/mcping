@@ -37,6 +37,8 @@ class MCSocket(val hostname: String, val port: Int, val protocolVersion: Int) {
         if(payload[0].toInt() != 0x00)
             throw RuntimeException("invalid packet id for status reponse: ${payload[0]}")
 
+        sock.close()
+
         // get the payload as a string
         val jsonStr = payload.copyOfRange(3, payload.size).toString(Charsets.UTF_8)
 
