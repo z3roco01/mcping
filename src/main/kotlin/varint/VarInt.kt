@@ -20,7 +20,6 @@ class VarInt(var value: Int) {
         // copy value so it does not affect the actual value
         var cpy = value
         // loop up to 4 times since VarInt cannot be longer than 5 bytes
-        println()
         for(i in 0..4) {
             // if there are no other bits set except the ones in the segment, write the last byte and return
             if(cpy and SEGMENT_MASK.inv() == 0) {
@@ -66,14 +65,18 @@ class VarInt(var value: Int) {
             // only read up to 5 bytes
             for(i in 0..4) {
                 // read in the next byte
-                val curByte = input.readNBytes(1)
-                // if the read byte array size is 0, then there are no more bytes, so finish
+                val curByte = input.read()
+                // if the read byte is -1 then this is the end of the stream
                 // ( should not happen in a packet, but does happen in tests )
-                if(curByte.size == 0)
+                if(curByte == -1)
                     break
 
                 // or in the segment, shifted left by the correct amount
-                value = value or ((curByte[0].toInt() and SEGMENT_MASK) shl i*7)
+                value = value or ((curByte.toInt() and SEGMENT_MASK) shl i*7)
+
+                // if the continue bit is not set then it is done reading
+                if(curByte and CONTINUE_MASK == 0)
+                    break
             }
             return VarInt(value)
         }
