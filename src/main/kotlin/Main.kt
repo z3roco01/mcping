@@ -6,7 +6,8 @@ import z3roco01.mcping.network.Packet
 import z3roco01.mcping.varint.VarInt
 
 fun main() {
-    val sock = MCSocket("mc.hypixel.net")
+    val sock = MCSocket("127.0.0.1")
+    sock.getStatus()
     /*var varint = VarInt(772)
     var varintB = varint.toBytes()
     for(b in varintB) {

@@ -48,7 +48,7 @@ class VarIntTest {
     private fun testDecode(expected: Int, bytes: ByteArray) {
         // create a stream since it expects one from the socket
         val stream = BufferedInputStream(bytes.inputStream())
-        val varInt = VarInt.fromStream(BufferedInputStream(bytes.inputStream()))
+        val varInt = VarInt.fromStream(stream)
         assertEquals(expected, varInt.value)
     }
 }

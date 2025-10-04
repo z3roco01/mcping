@@ -17,19 +17,20 @@ class HandshakePacket(val protocolVersion: VarInt, val hostname: String, val por
         // 1 for id, protocol version length, hostname length bytes size, hostname length, port length, intent length
         val length = 1 + protocolBytes.size + hostnameLengthBytes.size + hostname.length + 2 + 1
 
-        val bytes = ByteArray(length)
+        val lengthBytes = VarInt(length).toBytes()
+        val payload = ByteArray(length)
         // to keep track of the offset and make it cleaner
         var curOffest = 0
 
-        bytes[curOffest] = HANDSHAKE_ID
+        payload[curOffest] = HANDSHAKE_ID
         curOffest = 1
 
         // copy protocol version into
-        protocolBytes.copyInto(bytes, curOffest)
+        protocolBytes.copyInto(payload, curOffest)
         curOffest += protocolBytes.size
 
         // copy in the hostname length ( VarInt )
-        hostnameLengthBytes.copyInto(bytes, curOffest)
+        hostnameLengthBytes.copyInto(payload, curOffest)
         curOffest += hostnameLengthBytes.size
 
         // get hostname as bytes
@@ -37,18 +38,23 @@ class HandshakePacket(val protocolVersion: VarInt, val hostname: String, val por
         // keep it within range of 255 bytes
         if(hostnameBytes.size > 255) hostnameBytes = hostnameBytes.copyOf(255)
         // copy it in
-        hostnameBytes.copyInto(bytes, curOffest)
+        hostnameBytes.copyInto(payload, curOffest)
         curOffest += hostnameBytes.size
 
         // write in the 2 server port bytes
-        short2ByteArray(port).copyInto(bytes, curOffest)
+        short2ByteArray(port).copyInto(payload, curOffest)
         curOffest += 2
 
         // write in the intent as a varint
-        VarInt(intent.ordinal).toBytes().copyInto(bytes, curOffest)
+        VarInt(intent.ordinal).toBytes().copyInto(payload, curOffest)
+
+        // add the length to the payload
+        val packet = ByteArray(lengthBytes.size + payload.size)
+        lengthBytes.copyInto(packet, 0)
+        payload.copyInto(packet, lengthBytes.size)
 
         // its finally done so return it
-        return bytes
+        return packet
     }
 
     /**
