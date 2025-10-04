@@ -1,5 +1,6 @@
 package z3roco01.mcping.network
 
+import kotlinx.serialization.json.Json
 import z3roco01.mcping.varint.VarInt
 import java.io.BufferedInputStream
 import java.io.DataOutputStream
@@ -16,7 +17,7 @@ class MCSocket(val hostname: String, val port: Int, val protocolVersion: Int) {
     // constructor with just the hostname, uses most recent protocol version
     constructor(hostname: String): this(hostname, 773)
 
-    fun getStatus() {
+    fun getStatus(): StatusRequestData? {
         val sock = Socket(hostname, port)
         val output = DataOutputStream(sock.getOutputStream())
         val input = BufferedInputStream(sock.getInputStream())
@@ -33,13 +34,12 @@ class MCSocket(val hostname: String, val port: Int, val protocolVersion: Int) {
         val packetLen = VarInt.fromStream(input)
         // then read in the payload
         val payload = input.readNBytes(packetLen.value)
-        if(payload[0].toInt() != 0x00) {
-            println("invalid packet id for status reponse: ${payload[0]}")
-            return
-        }
+        if(payload[0].toInt() != 0x00)
+            throw RuntimeException("invalid packet id for status reponse: ${payload[0]}")
 
         // get the payload as a string
         val jsonStr = payload.copyOfRange(3, payload.size).toString(Charsets.UTF_8)
-        println(jsonStr)
+
+        return Json.decodeFromString<StatusRequestData>(jsonStr)
     }
 }
