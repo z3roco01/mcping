@@ -1,14 +1,29 @@
 package z3roco01.mcping
 
+import z3roco01.mcping.network.HandshakePacket
+import z3roco01.mcping.network.MCSocket
+import z3roco01.mcping.network.Packet
 import z3roco01.mcping.varint.VarInt
-import java.net.Socket
 
 fun main() {
-    //val sock = Socket("mc.hypixel.net", 25565)
-    val varInt = VarInt(25565)
-    val bytes = varInt.toBytes()
-    for(b in bytes) {
-        print("0x${b.toUByte().toHexString(HexFormat.UpperCase)} ")
+    val sock = MCSocket("mc.hypixel.net")
+    /*var varint = VarInt(772)
+    var varintB = varint.toBytes()
+    for(b in varintB) {
+        print("${b.toHexString(HexFormat.UpperCase)} ")
     }
     println()
+    varint.value = 14
+    varintB = varint.toBytes()
+    for(b in varintB) {
+        print("${b.toHexString(HexFormat.UpperCase)} ")
+    }
+    println()
+
+    val pack = HandshakePacket(VarInt(772), "mc.hypixel.net", 25565u, Packet.Intent.STATUS)
+    val bytes = pack.toBytes()
+    for(b in bytes) {
+        print("${b.toHexString(HexFormat.UpperCase)} ")
+    }
+    println()*/
 }
